@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>disable</ImplicitUsings><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GameDir>G:\SteamLibrary\steamapps\common\Probably Stolen</GameDir><ManagedDir>$(GameDir)\Probably Stolen_Data\Managed</ManagedDir></PropertyGroup>
+ <ItemGroup>
+  <Compile Include="Program.cs"/><Compile Include="..\src\Core.cs"/><Compile Include="..\src\Diagnostics.cs"/><Compile Include="..\src\RestartProtocol.cs"/><Compile Include="..\src\PublishingProtocol.cs"/><Compile Include="..\src\ButtonLocalization.cs"/>
+  <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath></Reference>
+  <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath></Reference>
+  <Reference Include="0Harmony"><HintPath>$(ManagedDir)\0Harmony.dll</HintPath></Reference>
+  <Reference Include="DseCecil"><HintPath>$(ManagedDir)\DseCecil.dll</HintPath></Reference>
+ </ItemGroup>
+ <ItemGroup><None Include="Fixtures\steam-changelog.html" Link="steam-changelog-sample.html" CopyToOutputDirectory="PreserveNewest" /></ItemGroup></Project>

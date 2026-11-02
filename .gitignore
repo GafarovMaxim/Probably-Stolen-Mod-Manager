@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+helper-build/
+helper-v*/
+work/
+package/
+release-*/
+companion-release-*/
+**/Backups/
+**/ModData/
+**/Tools/SteamCMD/
+*.pdb
+*.user
+*.suo
+.vs/
