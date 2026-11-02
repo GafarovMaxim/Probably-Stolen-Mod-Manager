@@ -3,7 +3,7 @@
   <ID>probably_mod_manager</ID>
   <Name>Probably Mod Manager</Name>
   <Author>Raul Moreau</Author>
-  <ModVersion>0.2.3</ModVersion>
+  <ModVersion>0.2.4</ModVersion>
   <Description>Mod manager. Adds convenient mod management and support for mod profiles. Error log. Provides a log of game errors, including the causes and the specific mod responsible, which simplifies debugging or the process of reporting bugs. / Менеджер модов. Добавляет удобное управление модификациями и профили для них. Журнал ошибок. Добавляет лог ошибок игры с отслеживанием причин и мода-виновника, упрощая процесс дебага или баг-репорта</Description>
   <GameVersions><Version>0.46D</Version><Version>100-Rev6</Version></GameVersions>
   <Prerequisites />

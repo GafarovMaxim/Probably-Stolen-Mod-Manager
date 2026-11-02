@@ -23,6 +23,9 @@ namespace ProbablyModManager
   }
   private void StyleDropdownButton(CustomUIElement element,bool header,bool selected)
   {
+   // The button prefab's layout group otherwise collapses decorative children and moves the caption.
+   var group=element.root.GetComponent<LayoutGroup>();if(group!=null)group.enabled=false;
+   var fitter=element.root.GetComponent<ContentSizeFitter>();if(fitter!=null)fitter.enabled=false;
    foreach(var image in element.root.GetComponentsInChildren<Image>(true))image.enabled=false;
    var background=element.root.GetComponent<Image>()??element.root.AddComponent<Image>();background.enabled=true;background.sprite=null;background.type=Image.Type.Simple;background.color=Color.white;background.raycastTarget=true;
    if(element.button!=null)
@@ -35,18 +38,19 @@ namespace ProbablyModManager
    if(element.text!=null)
    {
     element.text.color=header?new Color32(40,40,51,255):selected?new Color32(185,225,215,255):Muted;
-    element.text.alignment=TextAlignmentOptions.MidlineLeft;element.text.enableAutoSizing=false;element.text.fontSize=20;element.text.enableWordWrapping=false;element.text.overflowMode=TextOverflowModes.Ellipsis;
+    var textFitter=element.text.GetComponent<ContentSizeFitter>();if(textFitter!=null)textFitter.enabled=false;
+    element.text.alignment=TextAlignmentOptions.MidlineLeft;element.text.margin=Vector4.zero;element.text.enableAutoSizing=true;element.text.fontSizeMin=14;element.text.fontSizeMax=20;element.text.fontSize=20;element.text.enableWordWrapping=false;element.text.overflowMode=TextOverflowModes.Ellipsis;
     var label=element.text.rectTransform;var layout=label.GetComponent<LayoutElement>()??label.gameObject.AddComponent<LayoutElement>();layout.ignoreLayout=true;
     label.anchorMin=Vector2.zero;label.anchorMax=Vector2.one;label.offsetMin=new Vector2(header?12:20,2);label.offsetMax=new Vector2(header?-42:-12,-2);
    }
   }
   private static RectTransform DropdownStroke(RectTransform parent,string name,Vector2 position,Vector2 size,float angle,Color color)
   {
-   var item=new GameObject(name,typeof(RectTransform),typeof(Image));var rect=(RectTransform)item.transform;rect.SetParent(parent,false);rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f);rect.anchoredPosition=position;rect.sizeDelta=size;rect.localRotation=Quaternion.Euler(0,0,angle);var image=item.GetComponent<Image>();image.color=color;image.raycastTarget=false;return rect;
+   var item=new GameObject(name,typeof(RectTransform),typeof(Image),typeof(LayoutElement));item.GetComponent<LayoutElement>().ignoreLayout=true;var rect=(RectTransform)item.transform;rect.SetParent(parent,false);rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f);rect.anchoredPosition=position;rect.sizeDelta=size;rect.localRotation=Quaternion.Euler(0,0,angle);var image=item.GetComponent<Image>();image.color=color;image.raycastTarget=false;return rect;
   }
   private static RectTransform DrawDropdownChevron(RectTransform header)
   {
-   var node=new GameObject("dropdown arrow",typeof(RectTransform));var rect=(RectTransform)node.transform;rect.SetParent(header,false);rect.anchorMin=rect.anchorMax=new Vector2(1,.5f);rect.sizeDelta=new Vector2(16,12);rect.anchoredPosition=new Vector2(-21,0);
+   var node=new GameObject("dropdown arrow",typeof(RectTransform),typeof(LayoutElement));node.GetComponent<LayoutElement>().ignoreLayout=true;var rect=(RectTransform)node.transform;rect.SetParent(header,false);rect.anchorMin=rect.anchorMax=new Vector2(1,.5f);rect.sizeDelta=new Vector2(16,12);rect.anchoredPosition=new Vector2(-21,0);
    var color=new Color32(42,59,64,255);DropdownStroke(rect,"left",new Vector2(-3,1),new Vector2(8,2),-45,color);DropdownStroke(rect,"right",new Vector2(3,1),new Vector2(8,2),45,color);return rect;
   }
   private void OpenNativeSelect(CustomUIElement header,RectTransform arrow,IList<string> choices,int selected,Action<int> changed)

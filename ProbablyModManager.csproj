@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyName>ProbablyModManager</AssemblyName>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <GameDir Condition="'$(GameDir)' == ''">G:\SteamLibrary\steamapps\common\Probably Stolen</GameDir>
     <ManagedDir>$(GameDir)\Probably Stolen_Data\Managed</ManagedDir>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

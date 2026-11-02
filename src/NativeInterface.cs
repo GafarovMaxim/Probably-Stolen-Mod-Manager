@@ -62,7 +62,7 @@ namespace ProbablyModManager
     b.AddFlexibleSpace();NativeButton(b,Russian?"EN":"RU",()=>{data.Russian=!data.Russian;Save();NativeRecreate();},60);NativeButton(b,T("Штатное меню","Original menu"),OpenNative,205);b.End();b.AddSeparator(null,3);
     b.BeginColumn(6);nativeBody=b.CurrentContainer;Size(nativeBody,-1,-1,1,1);b.End();b.AddSeparator(null,3);
     b.BeginRow(10,TextAnchor.MiddleLeft);nativeRestartWarning=NativeLabel(b,"",20,Warning);nativeRestartWarning.SetFlexible(1,0);b.End();
-    b.BeginRow(10,TextAnchor.MiddleLeft);nativeStatus=NativeLabel(b,"Probably Mod Manager 0.2.3",18);nativeStatus.SetFlexible(1,0);nativeRestartButton=NativeButton(b,T("Перезапустить игру","Restart game"),()=>{manualRestartDialog=true;NativeInvalidate();},245,InMenu);b.End();nativeWindow.Show();Canvas.ForceUpdateCanvases();nativeWidth=Mathf.Max(1100,nativeWindow.ContentRoot.rect.width);nativeHeight=Mathf.Max(480,nativeWindow.ContentRoot.rect.height-178);nativeDirty=true;
+    b.BeginRow(10,TextAnchor.MiddleLeft);nativeStatus=NativeLabel(b,"Probably Mod Manager 0.2.4",18);nativeStatus.SetFlexible(1,0);nativeRestartButton=NativeButton(b,T("Перезапустить игру","Restart game"),()=>{manualRestartDialog=true;NativeInvalidate();},245,InMenu);b.End();nativeWindow.Show();Canvas.ForceUpdateCanvases();nativeWidth=Mathf.Max(1100,nativeWindow.ContentRoot.rect.width);nativeHeight=Mathf.Max(480,nativeWindow.ContentRoot.rect.height-178);nativeDirty=true;
    }
    nativeWindow.Show();
    if(blocker==null||blocker.transform.parent!=nativeWindow.root.transform.parent)
@@ -91,7 +91,7 @@ namespace ProbablyModManager
    if(nativeRestoreScroll.Count>0&&Time.frameCount>=nativeRestoreFrame){foreach(var pair in nativeRestoreScroll)if(pair.Key!=null)pair.Key.verticalNormalizedPosition=pair.Value;nativeRestoreScroll.Clear();}
    if(nativeRestartWarning?.IsAlive==true)nativeRestartWarning.SetText(ModLoader.RestartRequired?T("Изменения сохранены. Перезапусти игру вручную, чтобы применить их.","Changes saved. Restart the game manually to apply them."):T("Двойной клик — вкл./выкл. • Ctrl/Shift — выделение · ПКМ — действия","Double-click to enable/disable • Ctrl/Shift: select · Right-click: actions"));
    if(nativeRestartButton?.IsAlive==true){nativeRestartButton.SetVisible(!manualRestartDialog&&manualRestartRequest==null&&!publicationConfirm);nativeRestartButton.SetInteractable(InMenu&&!applying&&manualRestartRequest==null&&!PublishingBusy);}
-   if(nativeStatus?.IsAlive==true)nativeStatus.SetText(journal.Error.Length>0?"Log: "+journal.Error:toast.Length>0?toast:"Probably Mod Manager 0.2.3 · "+PlayerStore.VERSION+" / API "+Application.version);
+   if(nativeStatus?.IsAlive==true)nativeStatus.SetText(journal.Error.Length>0?"Log: "+journal.Error:toast.Length>0?toast:"Probably Mod Manager 0.2.4 · "+PlayerStore.VERSION+" / API "+Application.version);
   }
   private void BuildMods(CustomUIBuilder b)
   {
