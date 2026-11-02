@@ -1,4 +1,4 @@
-# Probably Mod Manager 0.2.4 — установка companion
+# Probably Mod Manager 0.2.5 — установка companion
 
 Эта инструкция для тех, кто подписался на Probably Mod Manager в Steam Workshop. Workshop загружает основной мод, но сам companion автоматически не запускает.
 
@@ -6,7 +6,7 @@
 
 1. Подпишитесь на мод в Workshop и дождитесь загрузки.
 2. В Steam откройте **Probably Stolen → Свойства → Установленные файлы → Обзор**. Найдите `Probably Stolen.exe`.
-3. Распакуйте архив `ProbablyModManager-Companion-0.2.4.zip` и скопируйте `Probably Mod Manager.exe` в ту же папку, где находится `Probably Stolen.exe`.
+3. Распакуйте архив `ProbablyModManager-Companion-0.2.5.zip` и скопируйте `Probably Mod Manager.exe` в ту же папку, где находится `Probably Stolen.exe`.
 4. Запускайте companion вручную один раз за игровую сессию. Если игра ещё не запущена, companion запустит её через Steam; если уже запущена — подключится к ней. Также можно сначала запустить игру обычным способом через Steam: Workshop-мод загрузится штатно, затем откройте companion.
 
 Для companion требуется **.NET 10 Desktop Runtime для Windows x64**. Официальная страница Microsoft: [.NET 10 downloads](https://dotnet.microsoft.com/en-us/download/dotnet/10.0); выберите Windows → Desktop Runtime → x64. Если companion уже запускается, устанавливать runtime не нужно.
@@ -21,7 +21,7 @@ SteamCMD необязателен и нужен только для публик
 
 ## Где получить архив
 
-Это отдельная загрузка companion; сам Workshop item содержит основной мод и не запускает помощник. Архив находится в папке `dist` репозитория [Probably-Stolen-Mod-Manager](https://github.com/GafarovMaxim/Probably-Stolen-Mod-Manager). Откройте файл `ProbablyModManager-Companion-0.2.4.zip` и нажмите кнопку скачивания. GitHub Release ещё не создавался; после его публикации ссылку на выпуск можно добавить в описание Workshop.
+Это отдельная загрузка companion; сам Workshop item содержит основной мод и не запускает помощник. Архив находится в папке `dist` репозитория [Probably-Stolen-Mod-Manager](https://github.com/GafarovMaxim/Probably-Stolen-Mod-Manager). Откройте файл `ProbablyModManager-Companion-0.2.5.zip` и нажмите кнопку скачивания. GitHub Release ещё не создавался; после его публикации ссылку на выпуск можно добавить в описание Workshop.
 
 В архив входят только companion EXE, эта инструкция и необязательный установщик SteamCMD. Учётные данные, настройки, кэш и DLL игры в архив не входят.
 

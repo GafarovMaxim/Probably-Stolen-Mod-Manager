@@ -31,12 +31,21 @@ namespace ProbablyModManager
    if(element.button!=null)
    {
     element.button.targetGraphic=background;element.button.transition=Selectable.Transition.ColorTint;
+    var canvasGroup=element.root.GetComponent<CanvasGroup>();if(canvasGroup!=null){canvasGroup.alpha=1;canvasGroup.blocksRaycasts=true;}
     var colors=element.button.colors;colors.normalColor=header?Mint:selected?new Color32(61,86,90,255):new Color32(43,37,54,255);
     colors.highlightedColor=header?new Color32(174,216,210,255):new Color32(68,92,96,255);colors.selectedColor=colors.normalColor;
     colors.pressedColor=header?new Color32(112,162,158,255):new Color32(85,120,121,255);colors.disabledColor=header?new Color32(81,104,105,255):new Color32(39,35,47,255);colors.fadeDuration=.09f;element.button.colors=colors;
    }
+   // Use the same label prefab as mod names instead of inheriting the button caption's rendering state.
+   string caption=element.text?.text??"";
+   if(element.text!=null)element.text.gameObject.SetActive(false);
+   var captionElement=NativeLabel(CustomUIManager.Instance.BuildInto(element.Rect,true),caption,20);
+   element.text=captionElement.text;
+   var captionRect=captionElement.Rect;var captionLayout=captionRect.GetComponent<LayoutElement>()??captionRect.gameObject.AddComponent<LayoutElement>();captionLayout.ignoreLayout=true;
+   captionRect.anchorMin=Vector2.zero;captionRect.anchorMax=Vector2.one;captionRect.offsetMin=Vector2.zero;captionRect.offsetMax=Vector2.zero;
    if(element.text!=null)
    {
+    element.text.gameObject.name="PMM dropdown caption";element.text.raycastTarget=false;element.text.maxVisibleCharacters=int.MaxValue;element.text.maxVisibleLines=int.MaxValue;
     element.text.color=header?new Color32(40,40,51,255):selected?new Color32(185,225,215,255):Muted;
     var textFitter=element.text.GetComponent<ContentSizeFitter>();if(textFitter!=null)textFitter.enabled=false;
     element.text.alignment=TextAlignmentOptions.MidlineLeft;element.text.margin=Vector4.zero;element.text.enableAutoSizing=true;element.text.fontSizeMin=14;element.text.fontSizeMax=20;element.text.fontSize=20;element.text.enableWordWrapping=false;element.text.overflowMode=TextOverflowModes.Ellipsis;
