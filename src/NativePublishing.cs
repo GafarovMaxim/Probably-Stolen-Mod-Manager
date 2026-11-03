@@ -85,8 +85,9 @@ namespace ProbablyModManager
     ApplyPublicationInspection(state);
     if(publicationRequestAction=="pick-preview"&&state.Phase!="selecting_preview"&&state.Phase!="error"&&publicationAppliedPreview!=state.RequestId&&state.Draft!=null&&publicationDraft!=null)
     {publicationAppliedPreview=state.RequestId;publicationDraft.PreviewPath=state.Draft.PreviewPath;SavePublicationDrafts();}
-    if(state.Phase=="success"&&state.PublishedFileId.Length>0&&publicationDraft!=null&&state.Draft?.ModId==publicationDraft.ModId&&publicationDraft.PublishedFileId!=state.PublishedFileId)
-    {publicationDraft.PublishedFileId=state.PublishedFileId;SavePublicationDrafts();}
+    string resultId=publicationRequestAction=="publish"&&publicationDraft!=null?PublishingProtocol.ResultItemId(state,publicationRequestId,publicationDraft.ModId):"";
+    if(resultId.Length>0&&publicationDraft.PublishedFileId!=resultId)
+    {publicationDraft.PublishedFileId=resultId;publicationReviewed=false;SavePublicationDrafts();}
    }
    string signature=state.RequestId+"|"+state.Phase+"|"+state.Message+"|"+state.PreparedId+"|"+state.PublishedFileId;
    if(signature!=publicationSignature)

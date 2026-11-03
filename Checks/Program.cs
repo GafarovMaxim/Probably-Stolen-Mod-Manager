@@ -82,6 +82,13 @@ internal static class Program
    var publishState=new PublicationState{Token=publishRequest.Token,SessionId="publish-session",HeartbeatUtc=now.ToString("o")};
    Check(PublishingProtocol.FreshState(publishState,publishRequest.Token,"publish-session",now)&&new PublicationDraft().Visibility==2,"Publishing defaults are not private or state handshake is broken");
    Console.WriteLine("PASS: publishing IPC freshness/session/token checks and private default.");
+   var itemState=new PublicationState{RequestId="result-request",Draft=new PublicationDraft{ModId="probably_mod_manager"},PublishedFileId="3832565677",Phase="review_required"};
+   Check(PublishingProtocol.ResultItemId(itemState,"result-request","probably_mod_manager")=="3832565677","Unconfirmed result lost its known Workshop ID");
+   itemState.Phase="success";Check(PublishingProtocol.ResultItemId(itemState,"result-request","probably_mod_manager")=="3832565677","Confirmed result ID lost");
+   Check(PublishingProtocol.ResultItemId(itemState,"other-request","probably_mod_manager")==""&&PublishingProtocol.ResultItemId(itemState,"result-request","probably_mcm")=="","Unrelated publication result ID accepted");
+   itemState.Phase="idle";Check(PublishingProtocol.ResultItemId(itemState,"result-request","probably_mod_manager")=="","Stale result ID accepted during inspection");
+   itemState.Phase="review_required";foreach(string invalid in new[]{"0","-1","not-an-id","3832565677/path","18446744073709551616"}){itemState.PublishedFileId=invalid;Check(PublishingProtocol.ResultItemId(itemState,"result-request","probably_mod_manager")=="","Invalid result ID accepted");}
+   Console.WriteLine("PASS: confirmed/unconfirmed Workshop ID recovery, request/mod isolation and invalid/stale ID rejection.");
    if (args.Length > 0)
    {
     string game = @"G:\SteamLibrary\steamapps\common\Probably Stolen\Probably Stolen_Data\Managed";

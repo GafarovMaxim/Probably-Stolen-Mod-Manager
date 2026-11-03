@@ -55,7 +55,7 @@ namespace ProbablyModManager
   }
   private void OpenChangelog(string id)
   {
-   ulong workshop=WorkshopId(id);if(workshop==0){toast=T("У локального мода нет страницы Steam Workshop","This local mod has no Steam Workshop page");return;}
+   ulong workshop=WorkshopPageId(id);if(workshop==0){toast=T("У локального мода нет страницы Steam Workshop","This local mod has no Steam Workshop page");return;}
    changesWindow?.Close();changesId=workshop;changesPage=1;
    var b=CustomUIManager.Instance.CreateWindow("pmm_changelog",T("История обновлений · ","Change notes · ")+(mods.FirstOrDefault(m=>m.Id==id)?.Name??id),InMenu?"menu":"meta",CustomUIManager.Instance.optionUIPrefab,CustomUIManager.Style.Meta).SetCloseOnEscape();changesWindow=b.Handle;
    changesWindow.Rect.anchorMin=Vector2.zero;changesWindow.Rect.anchorMax=Vector2.one;changesWindow.Rect.offsetMin=changesWindow.Rect.offsetMax=Vector2.zero;

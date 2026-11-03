@@ -43,6 +43,7 @@ internal sealed partial class PublishingEngine
    plan=null;state.PreparedId="";state.PreviewSnapshotPath="";state.PreviewSha256="";
    state.Files=new();state.TotalBytes=0;state.Draft=Clone(request.Draft);state.MetadataModId=request.Draft.ModId;
    state.DetectedPublishedFileId=binding.Id;state.BindingSource=binding.Source;state.DetectedTags=binding.Tags;
+   state.PublishedFileId="";state.PublishedUrl="";state.ErrorCode="";
    state.Phase="idle";state.Message=binding.Message.Length>0?binding.Message:binding.Id.Length>0?"Saved Workshop binding detected. No Steam item was created or changed.":"No valid saved Workshop binding found for this local mod. No item was selected by title.";
   }
   return Task.CompletedTask;
@@ -83,7 +84,11 @@ internal sealed partial class PublishingEngine
   try
   {
    EnsureNoReparse(dataRoot,path);var attempt=Read<Attempt>(path,8192);
-   if(attempt?.Result=="success"&&attempt.ModId==modId&&PositiveId(attempt.PublishedFileId,out string id))return new Binding{Id=id,Source="Probably Mod Manager confirmed publication"};
+   if(attempt?.ModId==modId&&PositiveId(attempt.PublishedFileId,out string id))
+   {
+    if(attempt.Result=="success")return new Binding{Id=id,Source="Probably Mod Manager confirmed publication"};
+    if(attempt.Result=="review_required")return new Binding{Id=id,Source="SteamCMD assigned ID; upload unconfirmed",Message="Recovered Workshop item ID "+id+" from the previous submission. Its upload result is still unconfirmed. Review the Workshop page before preparing an update; do not create another item."};
+   }
   }
   catch(Exception e)when(e is IOException||e is UnauthorizedAccessException||e is InvalidOperationException){}
   return new Binding();
@@ -187,6 +192,20 @@ internal sealed partial class PublishingEngine
   AssertThrows(()=>engine.BuildPlan(draft,"session"),"Existing Workshop binding allowed duplicate creation");
   foreach(string invalid in new[]{"<Wrong modId='example.mod' appId='4348910'><ItemId>3830305634</ItemId></Wrong>","<WorkshopBinding modId='other' appId='4348910'><ItemId>3830305634</ItemId></WorkshopBinding>","<WorkshopBinding modId='example.mod' appId='1'><ItemId>3830305634</ItemId></WorkshopBinding>","<WorkshopBinding modId='example.mod' appId='4348910'><ItemId>0</ItemId></WorkshopBinding>","<!DOCTYPE WorkshopBinding [<!ENTITY x SYSTEM 'file:///must-not-read'>]><WorkshopBinding modId='example.mod' appId='4348910'><ItemId>&x;</ItemId></WorkshopBinding>"})
   {File.WriteAllText(bindingPath,invalid);Assert(ReadBinding(mod,draft.ModId).Id.Length==0,"Invalid binding accepted");}
+  string attemptPath=Path.Combine(engine.publishingRoot,"attempts",HashText(draft.ModId+"\nnew")+".json");
+  foreach(string result in new[]{"success","review_required"})
+  {
+   Write(attemptPath,new Attempt{ModId=draft.ModId,Result=result,PublishedFileId="3832565677"});
+   var own=engine.ReadOwnBinding(draft.ModId);Assert(own.Id=="3832565677","Saved result ID not recovered: "+result);
+   if(result=="review_required")Assert(own.Message.Contains("unconfirmed"),"Unconfirmed upload was presented as confirmed");
+   AssertThrows(()=>engine.BuildPlan(draft,"session"),"Recovered ID allowed duplicate creation");
+  }
+  engine.state.PublishedFileId="999";engine.state.PublishedUrl="https://steamcommunity.com/sharedfiles/filedetails/?id=999";
+  await engine.Inspect(new PublicationRequest{Draft=draft});
+  Assert(engine.state.DetectedPublishedFileId=="3832565677"&&engine.state.Message.Contains("unconfirmed")&&engine.state.Phase!="success","Inspection lost recovered ID or claimed success");
+  Assert(engine.state.PublishedFileId.Length==0&&engine.state.PublishedUrl.Length==0,"Inspection retained another mod's result URL");
+  foreach(var invalid in new[]{new Attempt{ModId="other",Result="review_required",PublishedFileId="3832565677"},new Attempt{ModId=draft.ModId,Result="review_required",PublishedFileId="0"},new Attempt{ModId=draft.ModId,Result="started",PublishedFileId="3832565677"}})
+  {Write(attemptPath,invalid);Assert(engine.ReadOwnBinding(draft.ModId).Id.Length==0,"Unrelated, zero or unfinished result accepted");}
   var tags=ParseCatalog(ReadSeed());Assert(tags.Count==29&&tags.Any(t=>t.Name=="Mod")&&tags.Any(t=>t.Name=="Utilities"),"Embedded tag seed does not contain 29 expected Steam categories");
   string Fixture(uint appId)=>"<script id='valve-ssr-data'>"+JsonSerializer.Serialize(new{loaderData=new[]{JsonSerializer.Serialize(new{workshopConfig=new{appid=appId},declaredTags=new{declared_tags=new[]{new{tags=new[]{new{id="1",name="Mod",display_name="Mods",admin_only=false},new{id="2",name="Admin",display_name="Admin",admin_only=true}}}}}})}})+"</script>";
   var filtered=ParseCatalog(Fixture(AppId));Assert(filtered.Count==1&&filtered[0].Name=="Mod"&&filtered[0].Label=="Mods","Admin category was exposed or raw/display names confused");AssertThrows(()=>ParseCatalog(Fixture(1)),"Wrong Steam app accepted");

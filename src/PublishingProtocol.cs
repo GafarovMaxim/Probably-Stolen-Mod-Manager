@@ -35,6 +35,11 @@ namespace ProbablyModManager
  }
  public static class PublishingProtocol
  {
+  public static string ResultItemId(PublicationState state,string requestId,string modId)
+  {
+   if(state==null||state.RequestId!=requestId||state.Draft?.ModId!=modId||(state.Phase!="success"&&state.Phase!="review_required"))return "";
+   return ulong.TryParse(state.PublishedFileId,System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out var id)&&id>0?id.ToString(System.Globalization.CultureInfo.InvariantCulture):"";
+  }
   public static bool FreshRequest(PublicationRequest request,string token,string session,DateTime now)=>request!=null&&request.Draft!=null&&request.Token==token&&request.SessionId==session&&Guid.TryParseExact(request.RequestId,"N",out _)&&RestartProtocol.Recent(request.CreatedUtc,now,15);
   public static bool FreshState(PublicationState state,string token,string session,DateTime now)=>state!=null&&state.Token==token&&state.SessionId==session&&RestartProtocol.Recent(state.HeartbeatUtc,now,8);
  }
