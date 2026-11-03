@@ -62,7 +62,7 @@ namespace ProbablyModManager
     b.AddFlexibleSpace();NativeButton(b,Russian?"EN":"RU",()=>{data.Russian=!data.Russian;Save();NativeRecreate();},60);NativeButton(b,T("Штатное меню","Original menu"),OpenNative,205);b.End();b.AddSeparator(null,3);
     b.BeginColumn(6);nativeBody=b.CurrentContainer;Size(nativeBody,-1,-1,1,1);b.End();b.AddSeparator(null,3);
     b.BeginRow(10,TextAnchor.MiddleLeft);nativeRestartWarning=NativeLabel(b,"",20,Warning);nativeRestartWarning.SetFlexible(1,0);b.End();
-    b.BeginRow(10,TextAnchor.MiddleLeft);nativeStatus=NativeLabel(b,"Probably Mod Manager 0.2.5",18);nativeStatus.SetFlexible(1,0);nativeRestartButton=NativeButton(b,T("Перезапустить игру","Restart game"),()=>{manualRestartDialog=true;NativeInvalidate();},245,InMenu);b.End();nativeWindow.Show();Canvas.ForceUpdateCanvases();nativeWidth=Mathf.Max(1100,nativeWindow.ContentRoot.rect.width);nativeHeight=Mathf.Max(480,nativeWindow.ContentRoot.rect.height-178);nativeDirty=true;
+    b.BeginRow(10,TextAnchor.MiddleLeft);nativeStatus=NativeLabel(b,"Probably Mod Manager 0.2.6",18);nativeStatus.SetFlexible(1,0);nativeRestartButton=NativeButton(b,T("Перезапустить игру","Restart game"),RequestManualRestart,245,InMenu);b.End();nativeWindow.Show();Canvas.ForceUpdateCanvases();nativeWidth=Mathf.Max(1100,nativeWindow.ContentRoot.rect.width);nativeHeight=Mathf.Max(480,nativeWindow.ContentRoot.rect.height-178);nativeDirty=true;
    }
    nativeWindow.Show();
    if(blocker==null||blocker.transform.parent!=nativeWindow.root.transform.parent)
@@ -82,7 +82,7 @@ namespace ProbablyModManager
    {
     var offsets=nativeRenderedTab==tab&&nativeRenderedDual==dual?nativeBody.GetComponentsInChildren<ScrollRect>(false).Where(s=>s.gameObject.activeInHierarchy).Select(s=>s.verticalNormalizedPosition).ToArray():Array.Empty<float>();
     CloseContext();nativeDirty=false;nativeRows.Clear();nativeScrolls.Clear();nativeDetail=null;journalListRoot=null;journalDetailRoot=null;journalRepeats=null;nativePreview=null;var b=Into(nativeBody);
-    if(manualRestartDialog)BuildManualRestart(b);else if(applying)BuildApproval(b);else if(report.Length>0)BuildReport(b);else if(nativeConfirmation!=null)BuildConfirmation(b);else if(quickProfileDialog)BuildQuickProfileDialog(b);else switch(tab){case 0:BuildMods(b);break;case 1:BuildProfiles(b);break;case 2:BuildJournal(b);break;case 3:BuildPublishing(b);break;default:tab=0;BuildMods(b);break;}
+    if(applying)BuildApproval(b);else if(report.Length>0)BuildReport(b);else if(nativeConfirmation!=null)BuildConfirmation(b);else if(quickProfileDialog)BuildQuickProfileDialog(b);else switch(tab){case 0:BuildMods(b);break;case 1:BuildProfiles(b);break;case 2:BuildJournal(b);break;case 3:BuildPublishing(b);break;default:tab=0;BuildMods(b);break;}
     foreach(var styled in nativeBody.GetComponentsInChildren<ScrollRect>(true))StyleScroll(styled);CustomUIBuilder.RebuildLayout(nativeWindow.ContentRoot);nativeDumpAt=Time.unscaledTime+1;
     nativeRestoreScroll.Clear();var scrolls=nativeBody.GetComponentsInChildren<ScrollRect>(false).Where(s=>s.gameObject.activeInHierarchy).ToArray();for(int i=0;i<Math.Min(offsets.Length,scrolls.Length);i++)nativeRestoreScroll.Add(new KeyValuePair<ScrollRect,float>(scrolls[i],offsets[i]));nativeRestoreFrame=Time.frameCount+2;nativeRenderedTab=tab;nativeRenderedDual=dual;
    }
@@ -90,8 +90,8 @@ namespace ProbablyModManager
    if(nativeDumpAt>=0&&Time.unscaledTime>=nativeDumpAt){nativeDumpAt=-1;NativeDump();}
    if(nativeRestoreScroll.Count>0&&Time.frameCount>=nativeRestoreFrame){foreach(var pair in nativeRestoreScroll)if(pair.Key!=null)pair.Key.verticalNormalizedPosition=pair.Value;nativeRestoreScroll.Clear();}
    if(nativeRestartWarning?.IsAlive==true)nativeRestartWarning.SetText(ModLoader.RestartRequired?T("Изменения сохранены. Перезапусти игру вручную, чтобы применить их.","Changes saved. Restart the game manually to apply them."):T("Двойной клик — вкл./выкл. • Ctrl/Shift — выделение · ПКМ — действия","Double-click to enable/disable • Ctrl/Shift: select · Right-click: actions"));
-   if(nativeRestartButton?.IsAlive==true){nativeRestartButton.SetVisible(!manualRestartDialog&&manualRestartRequest==null&&!publicationConfirm);nativeRestartButton.SetInteractable(InMenu&&!applying&&manualRestartRequest==null&&!PublishingBusy);}
-   if(nativeStatus?.IsAlive==true)nativeStatus.SetText(journal.Error.Length>0?"Log: "+journal.Error:toast.Length>0?toast:"Probably Mod Manager 0.2.5 · "+PlayerStore.VERSION+" / API "+Application.version);
+   if(nativeRestartButton?.IsAlive==true){nativeRestartButton.SetVisible(!nativeRestartStarting&&!publicationConfirm);nativeRestartButton.SetInteractable(InMenu&&!applying&&!nativeRestartStarting&&!PublishingBusy&&Application.platform==RuntimePlatform.WindowsPlayer);}
+   if(nativeStatus?.IsAlive==true)nativeStatus.SetText(journal.Error.Length>0?"Log: "+journal.Error:toast.Length>0?toast:"Probably Mod Manager 0.2.6 · "+PlayerStore.VERSION+" / API "+Application.version);
   }
   private void BuildMods(CustomUIBuilder b)
   {
@@ -142,6 +142,7 @@ namespace ProbablyModManager
    if(!string.IsNullOrEmpty(mod.LoadError))NativeLabel(b,mod.LoadError,20,Warning);
    if(ModLoader.IsModEnabled(mod.Id)&&!mod.Loaded)NativeButton(b,T("Проверить активацию","Review activation"),()=>{PrepareApply(true);NativeInvalidate();},290,InMenu);
    if(selectedRows.Count>1){NativeLabel(b,T("Выделено модов: ","Selected mods: ")+selectedRows.Count,21,Warning);NativeLabel(b,T("ПКМ — действия с группой. Перетаскивание переносит всю группу.","Right-click for group actions. Drag moves the whole group."),18);}
+   NativeButton(b,T("Открыть страницу мода в Steam","Open mod page in Steam"),()=>OpenWorkshopPage(mod.Id),-1,WorkshopPageId(mod.Id)!=0);
    NativeButton(b,T("История обновлений · Steam","Change notes · Steam"),()=>OpenChangelog(mod.Id),-1,WorkshopId(mod.Id)!=0);b.AddSeparator();NativeLabel(b,FormatDescription(mod.Description),21);NativeLabel(b,T("Требует: ","Requires: ")+(mod.Dependencies.Length>0?string.Join(", ",mod.Dependencies):"—"),19);NativeLabel(b,T("Нужен для: ","Required by: ")+string.Join(", ",mods.Where(m=>m.Dependencies.Contains(mod.Id)).Select(m=>m.Name)),19);NativeLabel(b,T("Версии игры: ","Game versions: ")+(mod.GameVersions.Length==0?T("не указаны","unspecified"):string.Join(", ",mod.GameVersions)),19);
    b.AddSeparator();NativeLabel(b,T("МЕТКИ","TAGS"),21,Mint);BuildTagChips(b,GetTags(mod.Id),nativeWidth*.38f,true,mod.Id);b.BeginRow(8);NativeInput(b,T("Новая метка…","New tag…"),nativeTagDraft,value=>nativeTagDraft=value);NativeButton(b,T("Добавить","Add"),()=>AddTag(mod.Id,nativeTagDraft),145);b.End();
    b.BeginRow(8);foreach(var tag in new[]{"review","library","ui"}){string key=tag;NativeButton(b,TagLabel(tag),()=>AddTag(mod.Id,key),145);}b.End();NativeLabel(b,T("Заметка","Note"),19);NativeInput(b,T("Личная заметка…","Personal note…"),draftNote,value=>draftNote=value,true);NativeButton(b,T("Сохранить заметку","Save note"),()=>{data.Notes[mod.Id]=draftNote;Save();toast=T("Заметка сохранена","Note saved");},270);b.AddSeparator();NativeLabel(b,T("Разрешения: ","Capabilities: ")+(mod.Capabilities.Length==0?"—":string.Join(", ",mod.Capabilities.Select(ModCapability.DisplayName))),19);

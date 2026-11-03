@@ -9,7 +9,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>0.2.5</Version>
+    <Version>0.2.6</Version>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup><Compile Include="ManualHelper.cs" /><Compile Include="PublishingEngine.cs" /><Compile Include="PublishingMetadata.cs" /><Compile Include="PublishingAuthentication.cs" /><Compile Include="..\src\PublishingProtocol.cs" Link="PublishingProtocol.cs" /><Compile Include="..\src\RestartProtocol.cs" Link="RestartProtocol.cs" /></ItemGroup>

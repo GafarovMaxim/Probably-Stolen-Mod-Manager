@@ -110,7 +110,7 @@ namespace ProbablyModManager
         }
         private void Open()
         {
-            if (!initialized) return; TickRepairs(); TickManualRestart(); TickPublishing();
+            if (!initialized) return; TickRepairs(); TickPublishing();
             Refresh(); SetVisible(true); findings = Planner.Validate(mods, staged, Id);
         }
         private void SetVisible(bool value)
@@ -136,7 +136,7 @@ namespace ProbablyModManager
         }
         private void Update()
         {
-            if (!initialized) return; TickRepairs(); TickManualRestart(); TickPublishing();
+            if (!initialized) return; TickRepairs(); TickPublishing();
             if (uiAction != null)
             {
                 var action = uiAction; uiAction = null;
@@ -224,8 +224,8 @@ namespace ProbablyModManager
         private void OnDestroy()
         {
             if (Instance != this) return;
-            CancelManualRequest(); SavePublicationDrafts(); DisposePublicationPreview(); DisposeRepairs(); Save(); journal.Dispose(); Instance = null;
+            SavePublicationDrafts(); DisposePublicationPreview(); DisposeRepairs(); Save(); journal.Dispose(); Instance = null;
         }
-        private void OnApplicationQuit() { CancelManualRequest(); SavePublicationDrafts(); Save(); journal.FlushAll(); }
+        private void OnApplicationQuit() { SavePublicationDrafts(); Save(); journal.FlushAll(); }
     }
 }

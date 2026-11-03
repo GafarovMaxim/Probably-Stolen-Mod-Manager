@@ -95,16 +95,25 @@ internal static class Program
     Console.WriteLine("Hard flags=" + scan.HardFlags.Count + "; error=" + (scan.Error ?? "none"));
     Console.WriteLine(scan.FormatFindings(100));
     Check(!scan.Refused, "Game scanner refused the mod");
-    Check(scan.Capabilities.All(c => c == "files" || c == "reflection-external" || c == "network"), "Undeclared capability");
+    var declared=System.Xml.Linq.XDocument.Load(Path.Combine(folder,"manifest.xml")).Descendants("Capability").Select(c=>c.Value).ToArray();
+    Check(scan.Capabilities.All(c => declared.Contains(c)), "Undeclared capability");
+    Check(scan.Capabilities.Contains("native"), "Native restart capability was not detected");
     using(var ownAssembly=DseCecil.AssemblyDefinition.ReadAssembly(Path.Combine(folder,"ProbablyModManager.dll")))
     {
-     int exitCalls=0;
+     int exitCalls=0,restartCalls=0;
      foreach(var type in ownAssembly.MainModule.GetTypes())foreach(var method in type.Methods.Where(m=>m.HasBody))foreach(var instruction in method.Body.Instructions)
-      if(instruction.Operand is DseCecil.MethodReference call && call.DeclaringType.FullName=="UnityEngine.Application"&&call.Name=="Quit"){exitCalls++;Check(method.Name=="FinishManualRestart","Game exit outside manual restart confirmation");}
+     {
+      if(instruction.Operand is DseCecil.MethodReference call && call.DeclaringType.FullName=="UnityEngine.Application"&&call.Name=="Quit"){exitCalls++;Check(method.Name=="RequestManualRestart","Game exit outside manual restart button handler");}
+      if(instruction.Operand is DseCecil.MethodReference restart && restart.DeclaringType.FullName=="ProbablyModManager.NativeWindowsRestart"&&restart.Name=="TryStartReplacement"){restartCalls++;Check(method.Name=="RequestManualRestart","Process launch outside manual restart button handler");}
+      Check(!(instruction.Operand is DseCecil.MethodReference managed&&managed.DeclaringType.FullName=="System.Diagnostics.Process"),"Managed Process call in game DLL");
+     }
      Check(exitCalls==1,"Expected exactly one guarded manual exit call");
+     Check(restartCalls==1,"Expected exactly one manual replacement launch call");
+     var imports=ownAssembly.MainModule.GetTypes().SelectMany(t=>t.Methods).Where(m=>m.IsPInvokeImpl).ToArray();
+     Check(imports.Length==4&&imports.All(m=>m.PInvokeInfo.Module.Name=="kernel32.dll"),"Unexpected native imports");
      Check(!ownAssembly.MainModule.GetTypes().SelectMany(t=>t.Fields).Any(f=>f.Name=="AutoRestart"||f.Name=="restartAt"||f.Name=="ackDeadline"),"Automatic restart state still present");
     }
-    Console.WriteLine("PASS: one Application.Quit call, confined to guarded FinishManualRestart; no automatic-restart state.");
+    Console.WriteLine("PASS: process launch and Application.Quit confined to manual button handler; kernel32 imports only; no managed Process calls or automatic-restart state.");
     Console.WriteLine("PASS: original game scanner, no hard flags, all detected capabilities declared.");
    }
    return 0;

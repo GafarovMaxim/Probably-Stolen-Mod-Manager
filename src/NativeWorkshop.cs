@@ -22,6 +22,16 @@ namespace ProbablyModManager
   private bool changesPending;
   private readonly Dictionary<string,List<WorkshopChange>> changesCache=new Dictionary<string,List<WorkshopChange>>();
   private ulong WorkshopId(string id){var loaded=ModLoader.Mods.FirstOrDefault(m=>m.Manifest.ID==id);return loaded==null?0:loaded.WorkshopId!=0?loaded.WorkshopId:loaded.ShadowedWorkshopId;}
+  private ulong WorkshopPageId(string id)
+  {
+   ulong workshop=WorkshopId(id);if(workshop!=0)return workshop;
+   return publicationDrafts.TryGetValue(id,out var draft)&&ulong.TryParse(draft?.PublishedFileId,System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out workshop)?workshop:0;
+  }
+  private void OpenWorkshopPage(string id)
+  {
+   ulong workshop=WorkshopPageId(id);if(workshop==0)return;
+   try{ModWorkshop.OpenItemPage(workshop);}catch(Exception ex){toast=T("Не удалось открыть страницу Steam: ","Could not open the Steam page: ")+ex.Message;journal.Add("warning",toast);}
+  }
   private void BuildPreview(CustomUIBuilder b,ModInfo mod)
   {
    previewModId=mod.Id;b.AddImage((Sprite)null,-1,205);nativePreview=b.Last.image;

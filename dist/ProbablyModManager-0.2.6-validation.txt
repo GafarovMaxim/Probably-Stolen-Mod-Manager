@@ -1,0 +1,69 @@
+PASS: missing dependency, dependency order, stable sort, transitive enable, cycles, self-disable guard, duplicate IDs, missing mods, report redaction.
+PASS: transitive disabling, multiple tags, case-insensitive deduplication, migration and removed-tag persistence.
+PASS: drag insertion, dependency guard, no duplicate IDs, drop-on-self, independent tag removal.
+PASS: cross-list activation inserts at first/middle/end target, keeps multiple selections together and respects existing/new dependencies.
+PASS: group move order, self-drop, actual type ownership, unknown culprit, evidence boundary, real Steam change notes, unavailable page.
+PASS: manual restart requires a fresh request, matching session/token/acknowledgement; stale, cancelled and absent requests rejected; MCM EN/RU/ZH captions.
+PASS: publishing IPC freshness/session/token checks and private default.
+Actual game scanner: methods=607, capabilities=files,reflection-external,network,native
+Hard flags=0; error=none
+files: ProbablyModManager.Journal.ImportBootstrap -> File.Exists
+files: ProbablyModManager.Journal.ImportBootstrap -> FileStream..ctor
+files: ProbablyModManager.Journal.Drain -> Directory.CreateDirectory
+files: ProbablyModManager.Journal.Drain -> FileStream..ctor
+files: ProbablyModManager.Journal.Prune -> Directory.GetFiles
+files: ProbablyModManager.Journal.Prune -> File.GetLastWriteTimeUtc
+files: ProbablyModManager.Journal.Prune -> File.Delete
+files: ProbablyModManager.Journal.Export -> Directory.CreateDirectory
+files: ProbablyModManager.Journal.Export -> ZipFile.Open
+files: ProbablyModManager.Journal.Export -> File.Exists
+files: ProbablyModManager.Journal.Export -> FileStream..ctor
+files: ProbablyModManager.Journal.Previous -> Directory.Exists
+files: ProbablyModManager.Journal.Previous -> Directory.GetFiles
+files: ProbablyModManager.Journal.Previous -> File.GetLastWriteTimeUtc
+files: ProbablyModManager.Journal.Previous -> File.ReadLines
+files: ProbablyModManager.Manager.BuildPublicationPreview -> File.Exists
+files: ProbablyModManager.Manager.BuildPublicationPreview -> FileInfo..ctor
+files: ProbablyModManager.Manager.BuildPublicationPreview -> FileInfo.get_Length
+files: ProbablyModManager.Manager.BuildPublicationPreview -> File.ReadAllBytes
+reflection-external: ProbablyModManager.Manager.InstallMcmRepair -> Assembly.GetType on a computed assembly
+reflection-external: ProbablyModManager.Manager.InstallMcmRepair -> Type.GetMethod on a computed type
+reflection-external: ProbablyModManager.Manager.InstallMcmRepair -> Assembly.GetType on a computed assembly
+reflection-external: ProbablyModManager.Manager.InstallMcmRepair -> Type.GetMethod on a computed type
+reflection-external: ProbablyModManager.Manager.Refresh -> Assembly.GetTypes on a computed assembly
+reflection-external: ProbablyModManager.Manager.OpenSettings -> Assembly.GetType on a computed assembly
+reflection-external: ProbablyModManager.Manager.OpenSettings -> Type.GetMethod on a computed type
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.Get
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.set_timeout
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.SendWebRequest
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.get_result
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.get_error
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.get_downloadHandler
+network: ProbablyModManager.Manager/<FetchChangelog>d__226.MoveNext -> UnityWebRequest.get_downloadHandler
+native: ProbablyModManager.NativeWindowsRestart.TryStartReplacement -> Marshal.GetLastWin32Error
+native: ProbablyModManager.NativeWindowsRestart.TryStartReplacement -> Marshal.PtrToStringUni
+native: ProbablyModManager.NativeWindowsRestart.TryStartProcess -> Marshal.SizeOf
+native: ProbablyModManager.NativeWindowsRestart.TryStartProcess -> Marshal.GetLastWin32Error
+native: ProbablyModManager.NativeWindowsRestart.GetModuleFileNameW -> DllImport kernel32.dll!GetModuleFileNameW
+native: ProbablyModManager.NativeWindowsRestart.GetCommandLineW -> DllImport kernel32.dll!GetCommandLineW
+native: ProbablyModManager.NativeWindowsRestart.CreateProcessW -> DllImport kernel32.dll!CreateProcessW
+native: ProbablyModManager.NativeWindowsRestart.CloseHandle -> DllImport kernel32.dll!CloseHandle
+files: ProbablyModManager.Storage.Initialize -> Directory.CreateDirectory
+files: ProbablyModManager.Storage.Read -> File.Exists
+files: ProbablyModManager.Storage.Read -> File.ReadAllText
+files: ProbablyModManager.Storage.WriteText -> Directory.CreateDirectory
+files: ProbablyModManager.Storage.WriteText -> File.WriteAllText
+files: ProbablyModManager.Storage.WriteText -> File.Exists
+files: ProbablyModManager.Storage.WriteText -> File.Replace
+files: ProbablyModManager.Storage.WriteText -> File.Move
+PASS: process launch and Application.Quit confined to manual button handler; kernel32 imports only; no managed Process calls or automatic-restart state.
+PASS: original game scanner, no hard flags, all detected capabilities declared.
+PASS: Win32 layouts, path/command validation, native failure, quoted CreateProcessW --test-child launch and clean child exit.
+PASS: actual restart handler guards; storage/draft/flush and native failure retries; save/flush/start/quit order; repeated-click and throwing-Quit duplicate protection. All collaborators mocked; no game or processes launched.
+Historical validation of unchanged publishing backend (v0.2.2); not rerun for v0.2.6:
+PASS: snapshot whitelist/private-data exclusion including license/notice; fixed app ID/private visibility; VDF escaping; path traversal and DTD rejection; changed/added snapshot files, preview and VDF rejected; exact Steam-result ID matching; persistent new-item replay protection; fresh session/token checks; prepared cancellation; metadata binding/app/mod/root/DTD checks; SSR app/admin filtering; embedded 29-tag seed; catalog survives cancellation/session changes; login-only arguments, strict account validation, interactive busy lifetime, preserved valid plan on login failure/closure, invalid-plan rejection after login. No Steam process was started.
+No game restart or Workshop submission performed during v0.2.6 validation. Native child test does not prove successful game startup.
+Installed full-folder scanner verification:
+files: ProbablyModManager.Storage.WriteText -> File.Move
+PASS: process launch and Application.Quit confined to manual button handler; kernel32 imports only; no managed Process calls or automatic-restart state.
+PASS: original game scanner, no hard flags, all detected capabilities declared.
